@@ -10,25 +10,21 @@
 #include <SD.h>
 
 File myFile;
-String fileName = "TEST2.TXT";
+String fileName = "testFile.csv";
 int SD_CS = 10;
 boolean sdInit = false;
 
 void setup() {
-  // put your setup code here, to run once:
   Serial.begin(9600);
 
   if (sdCardInit()  ) {
-    writeToSDCard("Something");
+    writeToSDCard("Writing something");
     readFromSDCard();
   }
-
-
 }
 
 void loop() {
   // put your main code here, to run repeatedly:
-
 }
 
 boolean sdCardInit() {
@@ -40,7 +36,8 @@ boolean sdCardInit() {
     return false;
   }
 
-   char charName[fileName.length() + 1];
+  //SD.open() doesn't take a Strinng as an input so need to convert to char buffer
+  char charName[fileName.length() + 1];
   fileName.toCharArray(charName, (unsigned int)sizeof(charName));
   myFile = SD.open(charName, FILE_WRITE);
 
@@ -57,6 +54,7 @@ void writeToSDCard(String text) {
 
   if (myFile) {
     Serial.print("Writing...");
+    //Write text to file!!
     myFile.println(text);
     myFile.close();
     Serial.println("done.");
@@ -79,10 +77,8 @@ void readFromSDCard() {
     while (myFile.available()) {
       Serial.write(myFile.read());
     }
-    // close the file:
     myFile.close();
   } else {
-    // if the file didn't open, print an error:
     Serial.println("error opening file");
   }
 }
