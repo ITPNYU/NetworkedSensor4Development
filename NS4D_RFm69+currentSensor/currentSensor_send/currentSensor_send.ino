@@ -69,9 +69,6 @@ void setup() {
   
   Serial.println("\nRADIO INITIALIZED\n");
   
-  Serial.println("Measuring voltage and current with INA219 ...");
-  ina219.begin();
-  
   Serial.print("Sending sensor values every ");
   Serial.print(secondsDelay);
   Serial.println(" seconds");
@@ -90,6 +87,9 @@ void loop() {
   
   // put microcontroller to sleep for a number of milliseconds
   Narcoleptic.delay(secondsDelay * 1000); // convert seconds to milliseconds
+  
+  Serial.println("Measuring voltage and current with INA219 ...");
+  ina219.begin();
   
   // create new instance of our Packet struct
   Packet packet;
