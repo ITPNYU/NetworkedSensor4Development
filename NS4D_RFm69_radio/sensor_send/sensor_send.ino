@@ -4,32 +4,30 @@
 
 /*
 
-  This sketch demonstrates a simple low-power sensor node. It uses
-  the Narcoleptic low-power library to put the Arduino to sleep for 5 seconds.
-  Once awake, an INA219 current sensor takes a reading, and it's values are 
-  sent wirelessly using an RFm69 radio.
+  This sketch demonstrates a simple wireless low-power sensor node,
+  sending packets to the receiver on this network.
+  To make parsing packets easier, data is sent using the C++ struct.
+  This allows both sender and receiver to read and write to the packet
+  using the familiar object-dot-variable syntax.
   
-  See the "wiring_ina219.png" and "wiring_rfm69.png" for how to hookup the circuit.
+  See the "wiring_rfm69.png" for how to hookup the circuit.
   
-  To complete the example, run the "currentSensor_receive.ino" sketch
+  To complete the example, run the "sensor_receive.ino" sketch
   on another Arduino with an RFm69 connected
   
-  Be sure you have downloaded and installed the libraries used here:
+  Be sure you have downloaded and installed the library used here:
   
     RFm69 Library: https://github.com/lowpowerlab/rfm69
     Narcoleptic Library: https://code.google.com/p/narcoleptic/downloads/list
-    INA219 Library: https://github.com/adafruit/Adafruit_INA219
 
+  Created 24 March 2015
+  By Andy Sigler
+  
 */
 
 ///////////////////////////
 ///////////////////////////
 ///////////////////////////
-
-#include <Wire.h>
-#include <Adafruit_INA219.h>
-
-Adafruit_INA219 ina219;
 
 #include <RFM69.h>
 #include <SPI.h> // the RFM69 library uses SPI
@@ -48,10 +46,7 @@ int secondsDelay = 5; // the number of seconds this node will sleep between sens
 // instead of sending a string, we can send a struct
 // this struct must be shared between all nodes
 typedef struct {
-  float shuntvoltage;
-  float busvoltage;
-  float current_mA;
-  float loadvoltage;
+  int sensorReading; // value from analogRead()
   unsigned long aliveTime; // how long this node's been running, in milliseconds
 } Packet;
 
@@ -68,7 +63,6 @@ void setup() {
   radio.setPowerLevel(10); // min is 0, max is 31
   
   Serial.println("\nRADIO INITIALIZED\n");
-  
   Serial.print("Sending sensor values every ");
   Serial.print(secondsDelay);
   Serial.println(" seconds");
@@ -88,18 +82,9 @@ void loop() {
   // put microcontroller to sleep for a number of milliseconds
   Narcoleptic.delay(secondsDelay * 1000); // convert seconds to milliseconds
   
-  Serial.println("Measuring voltage and current with INA219 ...");
-  ina219.begin();
-  
   // create new instance of our Packet struct
   Packet packet;
-
-  // get information from out sensor, and save the values in our struct
-  packet.shuntvoltage = ina219.getShuntVoltage_mV();
-  packet.busvoltage = ina219.getBusVoltage_V();
-  packet.current_mA = ina219.getCurrent_mA();
-  packet.loadvoltage = packet.busvoltage + (packet.shuntvoltage / 1000);
-  
+  packet.sensorReading = analogRead(A0); // read values from the analog pins
   packet.aliveTime = millis(); // how long has this microcontroller been on?
   
   int numberOfRetries = 5;
