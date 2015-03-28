@@ -4,7 +4,7 @@
 
 /*
 
-  This sketch demonstrates a the different options
+  This sketch demonstrates all the different options
   available when using an RFm69 radio tranceiver.
   
   See the "wiring_rfm69.png" for how to hookup the circuit.
