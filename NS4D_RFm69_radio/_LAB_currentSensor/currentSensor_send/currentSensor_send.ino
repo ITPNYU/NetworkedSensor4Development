@@ -35,7 +35,6 @@ Adafruit_INA219 ina219;
 
 #include <RFM69.h>
 #include <SPI.h> // the RFM69 library uses SPI
-#include <Narcoleptic.h> // the lowpower library for putting the CPU to sleep
 
 RFM69 radio;
 
@@ -65,7 +64,7 @@ void setup() {
   Serial.begin(9600);
   
   // setup the radio
-  radio.initialize(myFrequency, myNetwork, myID);
+  radio.initialize(myFrequency, myID, myNetwork);
   
   radio.setPowerLevel(10); // min is 0, max is 31
   
@@ -82,14 +81,6 @@ void setup() {
 
 void loop() {
   
-  // first put the radio and the CPU to sleep, saving precious battery life
-  // the radio will not receive data while sleeping
-  
-  radio.sleep(); // radio will wake back up when we send data
-  
-  // put microcontroller to sleep for a number of milliseconds
-  Narcoleptic.delay(secondsDelay * 1000); // convert seconds to milliseconds
-  
   Serial.println("Measuring voltage and current with INA219 ...");
   ina219.begin();
   
@@ -103,19 +94,10 @@ void loop() {
   packet.loadvoltage = packet.busvoltage + (packet.shuntvoltage / 1000);
   
   packet.aliveTime = millis(); // how long has this microcontroller been on?
-  
-  int numberOfRetries = 5;
-  
+    
   // send reliable packet to the hub
   // notice the & next to packet when sending a struct
-  boolean gotACK =  radio.sendWithRetry(hubID,  &packet, sizeof(packet), numberOfRetries);
-  
-  if(gotACK) {
-    Serial.println("acknowledged :)");
-  }
-  else {
-    Serial.println("failed getting acknowledgement :(");
-  }
+  radio.send(hubID,  &packet, sizeof(packet));
 }
 
 ///////////////////////////

@@ -4,12 +4,15 @@
 
 /*
 
-  This sketch demonstrates a simple sensor hub, which listens for
-  packets sent from low-power sensor nodes nearby with the RFm69 radio.
+  This sketch demonstrates a simple wireless hub
+  listening for sensor packets from other nodes on this network.
+  To make parsing packets easier, data is sent using the C++ struct.
+  This allows both sender and receiver to read and write to the packet
+  using the familiar object-dot-variable syntax.
   
   See the "wiring_rfm69.png" for how to hookup the circuit.
   
-  To complete the example, run the "currentSensor_send.ino" sketch
+  To complete the example, run the "tempSensor_send.ino" sketch
   on another Arduino with an RFm69 connected
   
   Be sure you have downloaded and installed the library used here:
@@ -37,11 +40,7 @@ int myID = 0; // radios should be given unique ID's (0-254, 255 = BROADCAST)
 // our pre-defined packet structure
 // this struct must be shared between all nodes
 typedef struct {
-  float shuntvoltage;
-  float busvoltage;
-  float current_mA;
-  float loadvoltage;
-  unsigned long aliveTime; // how long this node's been running, in milliseconds
+  int tempurature;
 } Packet;
 
 ///////////////////////////
@@ -66,26 +65,30 @@ void loop() {
     
   // always check to see if we've received a message
   if (radio.receiveDone()) {
-          
+              
     // if the received message is the same size as our pre-defined Packet struct
     // then assume that it is actually one of our Packets
-    if(radio.DATALEN == sizeof(Packet)) {
-    
+    if(radio.DATALEN == sizeof(Packet)) {  
+      
       // convert the radio's raw byte array to our pre-defined Packet struct
       Packet newPacket = *(Packet*)radio.DATA;
       
-      Serial.print("[");
-      Serial.print(radio.SENDERID);
-      Serial.print("]\tshuntvoltage = ");
-      Serial.print(newPacket.shuntvoltage);
-      Serial.print("]\tbusvoltage = ");
-      Serial.print(newPacket.busvoltage);
-      Serial.print("]\tcurrent_mA = ");
-      Serial.print(newPacket.current_mA);
-      Serial.print("]\tloadvoltage = ");
-      Serial.print(newPacket.loadvoltage);
-      Serial.print("]\taliveTime = ");
-      Serial.println(newPacket.aliveTime);
+      // first get sender and RSSI before using the radio again
+      int senderID = radio.SENDERID;
+      int rssi = radio.readRSSI();
+      
+      // then acknowledge that the packet was received
+      if (radio.ACKRequested()){
+        radio.sendACK();
+      }
+      
+      Serial.print("(");
+      Serial.print(senderID);
+      Serial.print(")\t");
+      Serial.println(newPacket.tempurature);
+    }
+    else {
+      Serial.println("got unknown packet!");
     }
   }
 }
