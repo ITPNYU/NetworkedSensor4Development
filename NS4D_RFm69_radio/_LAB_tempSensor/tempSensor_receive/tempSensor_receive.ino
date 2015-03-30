@@ -40,7 +40,7 @@ int myID = 0; // radios should be given unique ID's (0-254, 255 = BROADCAST)
 // our pre-defined packet structure
 // this struct must be shared between all nodes
 typedef struct {
-  int tempurature;
+  float steinhart;
 } Packet;
 
 ///////////////////////////
