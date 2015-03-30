@@ -85,7 +85,7 @@ void loop() {
       Serial.print("(");
       Serial.print(senderID);
       Serial.print(")\t");
-      Serial.println(newPacket.tempurature);
+      Serial.println(newPacket.steinhart);
     }
     else {
       Serial.println("got unknown packet!");
