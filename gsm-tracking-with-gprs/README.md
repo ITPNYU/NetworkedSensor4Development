@@ -3,5 +3,4 @@ This is code to make a location logger with the Adafruit FONA. This was original
 
 The thing that is different is the Hookup Pins between the Arduino and the FONA. I added the Reset pin, because I've discovered it makes for more reliable operation to have control over it. Please note that and if you're looking at the Instructable AND this code, attach the FONA as it is defined in this code. 
 
-Good Luck,
--kina
+Good Luck
