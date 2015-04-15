@@ -5,16 +5,28 @@
 
   This code borrows some aspects from Chip McClelland @ Ubidots: http://ubidots.com/docs/devices/FONA.html
 
+  Hookup like this:
+  FONA RX -> Digital Pin 3
+  FONA TX -> Digital Pin 4
+  FONA RST -> Digital Pin 5
+  FONA KEY -> Digital Pin 6
+  FONA PS -> Digital Pin 7
+
  created 7 March 2015
+ modified 15 April 2015
  by Kina Smith
+
+  this code is in the public domain
 */
 
 #include <SoftwareSerial.h>
 
-#define FONA_RX 3 //connect to FONA RX
-#define FONA_TX 4 //connect to FONA TX
-#define FONA_KEY 5 //connection to FONA KEY
-#define FONA_PS 6 //connect to FONA PS
+//define FONA pins
+#define FONA_RX 3 //comms
+#define FONA_TX 4 //comms
+#define FONA_RST 5  //resets board
+#define FONA_KEY 6 //powers board down
+#define FONA_PS 7 //status pin. Is the board on or not?
 
 String APN = "__PUT YOUR APN HERE!!__"; //Set APN for Mobile Service
 
@@ -40,6 +52,7 @@ String Time;
 void setup() {
     pinMode(FONA_PS, INPUT);
     pinMode(FONA_KEY,OUTPUT);   
+    pinMode(FONA_RST, OUTPUT); 
     digitalWrite(FONA_KEY, HIGH);
     Serial.begin(9600);
     Serial.println("Started setup");
@@ -47,8 +60,6 @@ void setup() {
     /*=============Get Location and Post ONCE on Boot=============*/
     /*
     turnOnFONA(); //turn on FONA
-    Serial.println("Initializing: please wait 10 sec...");
-    delay(10000);
     setupGPRS(); //Setup a GPRS context
     if(getLocation()) { //try to get location, if OK do the rest
         //Print Lat/Lon Values
@@ -76,8 +87,6 @@ void setup() {
 void loop() {
     /*=============Get Location and Post EVERY 5 Minutes!=============*/
     turnOnFONA(); //turn on FONA
-    Serial.println("Initializing: please wait 10 sec...");
-    delay(10000);
     setupGPRS(); //Setup a GPRS context
     if(getLocation()) { //try to get location, if OK do the rest
         //Print Lat/Lon Values
@@ -97,11 +106,11 @@ void loop() {
         makeRequest(); //Make GET request
         turnOffFONA(); //turn off FONA
         flushFONA();
-        for(int i = 0; i < SLEEP_MINUTES; i++) {
-            delay(60000);
+        for(int i = 0; i < SLEEP_MINUTES; i++) { //wait for some minutes
+            delay(60000); 
         }
     } else {
-        delay(30000);
+        delay(30000); //if it fails, wait 30 sec and try again
     }
 }
 
@@ -325,17 +334,22 @@ void flushFONA() { //if there is anything is the fonaSS serial Buffer, clear it 
     }
 }
 void turnOnFONA() { //turns FONA ON
-    if(! digitalRead(FONA_PS)) { //Check if it's On already. LOW is off, HIGH is ON.
-        Serial.print("FONA was OFF, Powering ON: ");
-        digitalWrite(FONA_KEY,LOW); //pull down power set pin
-        unsigned long KeyPress = millis(); 
-        while(KeyPress + keyTime >= millis()) {} //wait two seconds
+    if(!digitalRead(FONA_PS)) { //Check if it's ON already. LOW is off, HIGH is ON.
+        digitalWrite(FONA_KEY,LOW); //Pull KEY LOW
+        delay(2000); //wait two seconds
         digitalWrite(FONA_KEY,HIGH); //pull it back up again
-        Serial.println("FONA Powered Up");
-    } else {
-        Serial.println("FONA Already On, Did Nothing");
-    }
+        Serial.println("FONA Powering Up, wait 10 sec...");
+    } else Serial.println("FONA was already on");
+    delay(5000); //wait for FONA to power on
+    //reset module
+    digitalWrite(FONA_RST, HIGH);
+    delay(10);
+    digitalWrite(FONA_RST, LOW);
+    delay(100);
+    digitalWrite(FONA_RST, HIGH);
+    delay(1000);
 }
+
 void turnOffFONA() { //does the opposite of turning the FONA ON (ie. OFF)
     if(digitalRead(FONA_PS)) { //check if FONA is OFF
         Serial.print("FONA was ON, Powering OFF: "); 
