@@ -1,0 +1,17 @@
+#Xively Data Logger 
+
+This is a repo for the Xively Logger to be used with the SD Card examples.
+
+Go to the [Xively](https://personal.xively.com/dev/)
+
+User Account:
+	usrname: ns4d
+	psswrd: networksforsensors
+
+
+you test this code by adding a new device in the Xively panel. 
+
+Creating a data channel with the id you want
+Putting its FEED_ID and API_KEY values in the correct variables.
+
+

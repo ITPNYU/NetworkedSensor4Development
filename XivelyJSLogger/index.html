@@ -1,0 +1,95 @@
+
+<script src="http://code.jquery.com/jquery-1.11.2.js" type="text/javascript"></script>
+<script src="http://d23cj0cdvyoxg0.cloudfront.net/xivelyjs-1.0.4.min.js"></script>
+
+<script type="text/javascript">
+	(function($){
+		console.log($);
+		// xively.setKey( "IkGTayfXggl4Vyih9jp5mN6IjiBVmpsTtlQsIiQBNoOnUQGu" );  
+		
+		// // Get realtime updates on a datastream  
+		// // xively.datastream.subscribe( "1223001190", "my phone", function( event, data ) {  
+		// //   console.log( data.current_value ); // Logs value changes in realtime  
+		// // }); 	
+
+
+		// setTimeout(function() {
+		// 	xively.feed.get("1223001190",function(event,data){
+		// 		console.log(data);
+		// 	})
+
+		// }, (1000));
+var settings1 =  {
+				  "version":"1.0.0",
+				   "datastreams" : [ {
+				        "id" : "sensor value",
+				        "datapoints":[
+				        {"at":"2015-04-28 11:12:39 -0400","value":"42"},
+				        {"at":"2015-04-28 11:13:39 -0400","value":"84"},
+				        {"at":"2015-04-28 11:15:39 -0400","value":"41"},
+				        {"at":"2015-04-28 11:19:39 -0400","value":"83"}
+				        ],
+				        "current_value" : "50"
+				    }
+				  ],
+				};
+
+
+			$.ajax({
+	            url         : "http://api.xively.com/v2/feeds/1262507360?api_key=DrjCwzDUpfRaEkwZ8wL5d4VhedAURcCsckQir3Iwys6tAYoI",
+	            type        : 'PUT',
+	            headers     : {
+	              "X-ApiKey" : "DrjCwzDUpfRaEkwZ8wL5d4VhedAURcCsckQir3Iwys6tAYoI",
+	              "Content-Type": "application/json"
+	            },
+	            data        :JSON.stringify(settings1),
+	            crossDomain : true,
+	            dataType    : 'json',
+	            // cache       : cacheRequest
+	          })
+	          .done(function(data){
+	          	console.log(data);
+	          });
+	// var settings= {
+	// 	  "key":{
+	// 	    "label":"sharing key",
+	// 	    "private_access":"true",
+	// 	    "permissions":[
+	// 	      {
+	// 	        "access_methods":["get","put","post","delete"],
+	// 	        "source_ip":"192.168.0.1",
+	// 	        "resources":[
+	// 	          {
+	// 	            "feed_id":"424",
+	// 	            "datastream_id":"fan1"
+	// 	          }
+	// 	        ]
+	// 	      },
+	// 	      {
+	// 	        "access_methods":["get"],
+	// 	        "referer":"www.example.com"
+	// 	      }
+	// 	    ]
+	// 	  }
+	// 	}
+		// $.ajax({
+	 //            url         : "https://api.xively.com/v2/feeds/1262507360?api_key=DrjCwzDUpfRaEkwZ8wL5d4VhedAURcCsckQir3Iwys6tAYoI&duration=6hours&interval=0",
+	 //            type        : 'get',
+	 //            headers     : {
+	 //              "X-ApiKey" : "DrjCwzDUpfRaEkwZ8wL5d4VhedAURcCsckQir3Iwys6tAYoI",
+	 //              "Content-Type": "application/json"
+	 //            },
+	 //            // data  : JSON.stringify(settings),
+	 //            crossDomain : true,
+	 //            dataType    : 'json',
+	 //            // cache       : cacheRequest
+	 //          })
+	 //          .done(function(data){
+	 //          	console.log(data);
+	 //          });
+	          // .fail(settings.fail)
+	          // .always(settings.always);
+	})($);
+
+</script>
+ 
